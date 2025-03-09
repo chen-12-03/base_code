@@ -95,12 +95,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     {
         uart_tx_busy = 1;
         HAL_CAN_DeactivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
+		
+		//显示转换 保证串口绘图中电流正常
+		int32_t current_32bit = (int32_t)motor.torque_current;
 
 		//搓！serialplot通信正常
 		uart_buf[0]=0xAA;
 		memcpy(&uart_buf[1],&motor.total_angle,4);
-		memcpy(&uart_buf[5],&motor.torque_current,4);
-		memcpy(&uart_buf[9],&target_pos,4);
+		memcpy(&uart_buf[5],&current_32bit,4);
+		memcpy(&uart_buf[9],(const void*)&target_pos,4);
 		memcpy(&uart_buf[13],&motor.left_limit,4);
 		memcpy(&uart_buf[17],&motor.right_limit,4);
 
